@@ -1,4 +1,6 @@
 package games;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
+
 import java.net.Socket;
 import java.sql.*;
 import java.util.ArrayList;
@@ -60,32 +62,45 @@ public class App  {
         System.exit(0);
 
     }
-    void creategame() throws Exception{
-        Server s = new Server("Sample game ");
-        //s.setDaemon(true);
-        System.out.println("Waiting about 10 seconds for everyone to connect");
-        s.start();
+    void creategame(){
+        try {
+            Server s = new Server("Sample game ");
+            //s.setDaemon(true);
+            System.out.println("Waiting about 15 seconds for everyone to connect");
+            s.start();
 
 
+            s.join();
+            System.out.println("Server finished");
+            System.out.println("Let the game begin");
+            System.out.println(s.recievefromclients.size());
+            int numberofclients = s.recievefromclients.size();
+            assert (numberofclients == s.recievefromclients.size() && numberofclients == s.sendclients.size());
+            for (int t = 0; t < 25; t++) {
+                for (int i = 0; i < numberofclients; i++) {
 
-        s.join();
-        System.out.println("Server finished");
-        System.out.println("Let the game begin");
-        System.out.println(s.recievefromclients.size());
-        int numberofclients=s.recievefromclients.size();
-        assert(numberofclients==s.recievefromclients.size() && numberofclients==s.sendclients.size());
-        for(int t=0;t<25;t++){
-            for(int i=0;i<numberofclients;i++){
-                s.sendclients.get(i).writeUTF("send");
+                    s.sendclients.get(i).writeUTF("send");
 
-                String number=s.recievefromclients.get(i).readUTF();
-                for(int j=0;j<numberofclients;j++){
-                    if(i==j)continue;
-                    s.sendclients.get(j).writeUTF(number);
+                    String number = s.recievefromclients.get(i).readUTF();
+                    if(number.contains("Player")){
+                        System.out.println(number);
+                        for (int j = 0; j < numberofclients; j++) {
+                            if (i == j) continue;
+                            s.sendclients.get(j).writeUTF(number);
+                        }
+                        Thread.sleep(1000);
+                        System.exit(0);
+                    }
+                    for (int j = 0; j < numberofclients; j++) {
+                        if (i == j) continue;
+                        s.sendclients.get(j).writeUTF(number);
+                    }
                 }
             }
+        }catch (Exception e){
+            System.out.println("Exited the system");
+            System.exit(0);
         }
-
 
 
     }

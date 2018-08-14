@@ -1,5 +1,6 @@
 package games;
 import com.sun.xml.internal.ws.util.StringUtils;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
 import javax.print.attribute.standard.NumberUp;
 import javax.swing.*;
@@ -40,6 +41,10 @@ class Bingothread extends Thread{
                 if(isNum(recievestring)){
                     bingo.setbitsarray(Integer.parseInt(recievestring));
                 }else{
+                    if(recievestring.contains("Player")){
+                        System.out.println(recievestring);
+                        System.exit(0);
+                    }
                     bingo.inputallowed=true;
                 };
             } catch (IOException e) {
@@ -54,7 +59,7 @@ class Bingothread extends Thread{
 public class Bingogame extends JFrame{
     public static int running=1;
     private JButton Buttonarray[];
-    private static int counter=0;
+    static int counter=0;
     public int id ;
     public JLabel noticetext;
     private ArrayList <Integer> values;
@@ -109,7 +114,7 @@ public class Bingogame extends JFrame{
         return 0;
     }
 
-    public void setbitsarray(int i) throws InterruptedException {
+    public void setbitsarray(int i) throws InterruptedException, IOException {
 
         for(int j=0;j<25;j++){
             if(values.get(j).equals(i))
@@ -120,11 +125,18 @@ public class Bingogame extends JFrame{
         }
         if(check()==1){
             System.out.println("Player "+String.valueOf(this.id));
+            ostream.writeUTF("Player "+String.valueOf(this.id)+" Won" );
+            System.out.println("Player "+String.valueOf(this.id)+" Won");
+            Thread.sleep(3000);
             System.exit(0);
+
+
         }
     }
     Bingogame(InetAddress address, int port){
-            id =++counter;
+
+
+            System.out.println("id = "+id);
             setTitle(" Bingo ");
             setSize(600,600);
             noticetext= new JLabel("Bingo game");
@@ -212,15 +224,17 @@ public class Bingogame extends JFrame{
                     }
                 }
                 //setbits.get()
+                try {
                 if(check()==1){
-                    System.out.println("Player "+String.valueOf(player.id));
+                    player.ostream.writeUTF("Player ");
+                    Thread.sleep(3000);
                     System.exit(0);
 
                 }
                 System.out.println(command);
-                try {
-                    ostream.writeUTF(command);
-                } catch (IOException e) {
+
+                    player.ostream.writeUTF(command);
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                inputallowed=false;

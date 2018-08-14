@@ -40,10 +40,8 @@ public class Server extends Thread
 
 
     public ServerSocket serversocket;
-    // the stream for sending data to clients
     private ArrayList <Socket> socketsofclients;
     public ArrayList <DataOutputStream> sendclients;
-    // the stream of recieving data from clients
     public ArrayList <DataInputStream> recievefromclients;
     public ServiceQueue sq;
     public String state;
@@ -62,7 +60,6 @@ public class Server extends Thread
         this.socketsofclients = new ArrayList<Socket>();
         this.sendclients = new ArrayList<DataOutputStream>();
         this.recievefromclients = new ArrayList<DataInputStream>();
-
         System.out.println(gamename);
         System.out.println("Waiting for people to connect");
         System.out.println("Enter start when everybody connected");
@@ -75,21 +72,19 @@ public class Server extends Thread
         return socketsofclients;
     }
     public synchronized void  initialize()throws InterruptedException{
-        int number=0;
+        int number=1;
         long t =System.currentTimeMillis();
         long end = t+15000;
         while(System.currentTimeMillis()<end) {
             try {
                 while(!sq.socketqueue.isEmpty()) {
-
                     Socket server=sq.socketqueue.poll();
                     this.socketsofclients.add(server);
                     this.sendclients.add(new DataOutputStream(server.getOutputStream()));
                     this.recievefromclients.add(new DataInputStream(server.getInputStream()));
-                    System.out.println("The client "+(++number)+" has entered");
-
+                    System.out.println("The client "+(number++)+" has entered");
+                    sendclients.get(number-1).writeUTF("id"+String.valueOf(number));
                 }
-
                 Thread.sleep(100);
             }catch(IOException e){
                 e.printStackTrace();
