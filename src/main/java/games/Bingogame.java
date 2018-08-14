@@ -120,7 +120,7 @@ public class Bingogame extends JFrame{
         }
         if(check()==1){
 
-           App.publish(this);
+
         }
     }
     Bingogame(InetAddress address, int port){
@@ -213,11 +213,7 @@ public class Bingogame extends JFrame{
                 }
                 //setbits.get()
                 if(check()==1){
-                    try {
-                        App.publish(player);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+
 
                 }
                 System.out.println(command);
