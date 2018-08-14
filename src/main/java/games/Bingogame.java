@@ -1,4 +1,7 @@
 package games;
+import com.sun.xml.internal.ws.util.StringUtils;
+
+import javax.print.attribute.standard.NumberUp;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -18,11 +21,27 @@ class Bingothread extends Thread{
         bingo=b;
         ostream=oStream;istream=iStream;
     }
+    public static boolean isNum(String strNum) {
+        boolean ret = true;
+        try {
+
+            Double.parseDouble(strNum);
+
+        }catch (NumberFormatException e) {
+            ret = false;
+        }
+        return ret;
+    }
     public void run(){
         while(true){
             try {
+
                 String recievestring = istream.readUTF();
-                bingo.setbitsarray(Integer.parseInt(recievestring));
+                if(isNum(recievestring)){
+                    bingo.setbitsarray(Integer.parseInt(recievestring));
+                }else{
+                    bingo.inputallowed=true;
+                };
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (InterruptedException e) {
@@ -39,7 +58,6 @@ public class Bingogame extends JFrame{
     public int id ;
     public JLabel noticetext;
     private ArrayList <Integer> values;
-    private Server serverinstance;
     private ArrayList <Integer> setbits;
     private JPanel boxesPanel ;
     private DataOutputStream ostream;
@@ -105,7 +123,7 @@ public class Bingogame extends JFrame{
            App.publish(this);
         }
     }
-    Bingogame(Server s){
+    Bingogame(InetAddress address, int port){
             id =++counter;
             setTitle(" Bingo ");
             setSize(600,600);
@@ -114,15 +132,14 @@ public class Bingogame extends JFrame{
             boxesPanel=new JPanel();
             noticetext.setBounds(250,00,250,100);
             add(noticetext);
-            serverinstance=s;
             //boxesPanel.setLayout(new GridLayout(5,5));
             boxesPanel.setSize(500,500);
             Buttonarray = new JButton [25];
             values = new ArrayList<>();
             setbits=  new ArrayList<>();;
-            System.out.println("Connecting to serverName "+s.serversocket.getInetAddress()+" on port "+s.serversocket.getLocalPort());
+            System.out.println("Connecting to serverName "+address+" on port "+port);
             try{
-                this.clientsocket = new Socket(s.serversocket.getInetAddress(),s.serversocket.getLocalPort());
+                this.clientsocket = new Socket(address,port);
                 this.ostream = new DataOutputStream(this.clientsocket.getOutputStream());
                 this.istream = new DataInputStream(this.clientsocket.getInputStream());
             }
@@ -218,9 +235,10 @@ public class Bingogame extends JFrame{
 
     public static void main(String [] args)throws IOException,InterruptedException{
 
-        Server s =  new Server("Sample game");
-        s.start();
-        Bingogame b = new Bingogame(s);
+
+
+        byte [] address = new byte []{ (byte) 192, (byte)168,(byte)125,(byte)201};
+        Bingogame b = new Bingogame(InetAddress.getByAddress(address),5000);
         b.setVisible(true);
     }
 

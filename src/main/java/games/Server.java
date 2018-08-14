@@ -71,11 +71,13 @@ public class Server extends Thread
         sq.setDaemon(true);
         sq.start();
     }
-
+    public ArrayList<Socket> getSocketList(){
+        return socketsofclients;
+    }
     public synchronized void  initialize()throws InterruptedException{
         int number=0;
         long t =System.currentTimeMillis();
-        long end = t+10000;
+        long end = t+15000;
         while(System.currentTimeMillis()<end) {
             try {
                 while(!sq.socketqueue.isEmpty()) {
