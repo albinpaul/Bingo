@@ -1,12 +1,8 @@
 package games;
-import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 
-import java.net.Socket;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.logging.SocketHandler;
 
-import javax.swing.*;
 class connectToSql{
     static final String JDBC_DRIVER="com.mysql.jdbc.Driver";
     static final String DB_URL ="jdbc:mysql://localhost/";
@@ -71,17 +67,22 @@ public class App  {
 
 
             s.join();
+            int numberofclients = s.recievefromclients.size();
+            for (int j = 0; j < numberofclients; j++) {
+                s.sendclients.get(j).writeUTF("id"+String.valueOf(j+1));
+            }
             System.out.println("Server finished");
             System.out.println("Let the game begin");
-            System.out.println(s.recievefromclients.size());
-            int numberofclients = s.recievefromclients.size();
+
+
             assert (numberofclients == s.recievefromclients.size() && numberofclients == s.sendclients.size());
             for (int t = 0; t < 25; t++) {
                 for (int i = 0; i < numberofclients; i++) {
 
                     s.sendclients.get(i).writeUTF("send");
-
+                    System.out.println("sended to client "+(i+1));
                     String number = s.recievefromclients.get(i).readUTF();
+                    System.out.println("got "+number+" from client ");
                     if(number.contains("Player")){
                         System.out.println(number);
                         for (int j = 0; j < numberofclients; j++) {
@@ -90,11 +91,15 @@ public class App  {
                         }
                         Thread.sleep(1000);
                         System.exit(0);
+
+                    }else{
+                        System.out.println(number);
+                        for (int j = 0; j < numberofclients; j++) {
+                            if (i == j) continue;
+                            s.sendclients.get(j).writeUTF(number);
+                        }
                     }
-                    for (int j = 0; j < numberofclients; j++) {
-                        if (i == j) continue;
-                        s.sendclients.get(j).writeUTF(number);
-                    }
+
                 }
             }
         }catch (Exception e){

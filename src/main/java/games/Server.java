@@ -83,7 +83,7 @@ public class Server extends Thread
                     this.sendclients.add(new DataOutputStream(server.getOutputStream()));
                     this.recievefromclients.add(new DataInputStream(server.getInputStream()));
                     System.out.println("The client "+(number++)+" has entered");
-                    sendclients.get(number-1).writeUTF("id"+String.valueOf(number));
+
                 }
                 Thread.sleep(100);
             }catch(IOException e){

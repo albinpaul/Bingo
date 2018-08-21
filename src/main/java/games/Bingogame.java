@@ -38,14 +38,23 @@ class Bingothread extends Thread{
             try {
 
                 String recievestring = istream.readUTF();
+                System.out.println(recievestring+" recieve string is "+isNum(recievestring));
                 if(isNum(recievestring)){
                     bingo.setbitsarray(Integer.parseInt(recievestring));
+
                 }else{
                     if(recievestring.contains("Player")){
                         System.out.println(recievestring);
                         System.exit(0);
                     }
-                    bingo.inputallowed=true;
+                    if(recievestring.contains("id")){
+                        bingo.id=Integer.parseInt(recievestring.substring(2));
+                        System.out.println("bingoid="+bingo.id);
+                    }
+                    if(recievestring.contains("send")){
+                        bingo.inputallowed=true;
+                    }
+
                 };
             } catch (IOException e) {
                 e.printStackTrace();
@@ -189,6 +198,7 @@ public class Bingogame extends JFrame{
             this.add(boxesPanel);
             //lock.unlock();
             inputallowed=false;
+            System.out.println("Bingo id "+this.id);
     }
 
     private class buttonListener implements ActionListener {
@@ -206,6 +216,7 @@ public class Bingogame extends JFrame{
                     flag=1;
                 }
             }
+
             //player.noticetext.setText(command);
             if(inputallowed && flag==0) {
 
